@@ -95,8 +95,9 @@ export function useCamera(): UseCameraReturn {
     }
 
     const canvas = document.createElement('canvas');
-    const targetWidth = 1080;
-    const targetHeight = 1920;
+    // Gunakan resolusi asli video agar tidak ada distorsi/double-crop
+    const targetWidth = video.videoWidth;
+    const targetHeight = video.videoHeight;
 
     canvas.width = targetWidth;
     canvas.height = targetHeight;
@@ -106,39 +107,14 @@ export function useCamera(): UseCameraReturn {
       throw new Error('Failed to get 2d canvas context.');
     }
 
-    // Logika object-fit: cover (Crop Center)
-    const videoWidth = video.videoWidth;
-    const videoHeight = video.videoHeight;
-    
-    const videoRatio = videoWidth / videoHeight;
-    const targetRatio = targetWidth / targetHeight;
-    
-    let sWidth = videoWidth;
-    let sHeight = videoHeight;
-    let sx = 0;
-    let sy = 0;
-
-    if (videoRatio > targetRatio) {
-      // Video lebih lebar secara proporsi dibanding target (perlu potong sisi kiri/kanan)
-      sWidth = videoHeight * targetRatio;
-      sx = (videoWidth - sWidth) / 2;
-    } else {
-      // Video lebih tinggi secara proporsi dibanding target (perlu potong sisi atas/bawah)
-      sHeight = videoWidth / targetRatio;
-      sy = (videoHeight - sHeight) / 2;
-    }
-
     // Jika menggunakan kamera depan, mirror hasil canvas agar sesuai dengan preview
     if (facingMode === 'user') {
       ctx.translate(targetWidth, 0);
       ctx.scale(-1, 1);
     }
 
-    ctx.drawImage(
-      video,
-      sx, sy, sWidth, sHeight, // Posisi dan ukuran source untuk dipotong (crop)
-      0, 0, targetWidth, targetHeight // Posisi dan ukuran destination di canvas
-    );
+    // Gambar full frame dari video tanpa crop (crop akan dihandle murni oleh composeImage.ts)
+    ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
 
     // Mengembalikan URL base64 format image/jpeg dengan kualitas 0.9
     return canvas.toDataURL('image/jpeg', 0.9);

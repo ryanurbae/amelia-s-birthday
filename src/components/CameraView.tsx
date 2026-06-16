@@ -132,9 +132,8 @@ export const CameraView: React.FC<CameraViewProps> = ({
       {/* 2. AREA KAMERA */}
       <div className="flex-1 min-h-0 flex items-center justify-center bg-[#0d0d0f] p-2 md:p-4">
         <div
-          className="relative overflow-hidden h-full max-w-full"
+          className="relative overflow-hidden w-full h-auto max-h-full max-w-full aspect-[9/16] md:w-auto md:h-full md:aspect-[1080/542]"
           style={{
-            aspectRatio: "9/16",
             border: `3px solid ${activeColor}`,
             margin: "0 auto",
           }}
@@ -156,8 +155,8 @@ export const CameraView: React.FC<CameraViewProps> = ({
             </div>
           )}
 
-          {/* Overlay Kotak Bantuan Selalu Muncul (Termasuk Saat Preview) Biar Gak Keliatan Zoom */}
-          <div className="absolute inset-0 pointer-events-none z-20 flex flex-col">
+          {/* Overlay Kotak Bantuan - Hanya untuk mobile (vertikal). Desktop sudah otomatis proporsional */}
+          <div className="absolute inset-0 pointer-events-none z-20 flex flex-col md:hidden">
             <div className="flex-1 bg-black/60"></div>
             {/* Area Tengah (Jendela) yang persis akan masuk final image */}
             <div className="w-full border-y border-white/40" style={{ aspectRatio: "1080/542" }}></div>
