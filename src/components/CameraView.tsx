@@ -19,6 +19,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
   const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
   const [isCapturing, setIsCapturing] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [isTimerEnabled, setIsTimerEnabled] = useState<boolean>(true);
 
   const activeColor = ACCENT_COLORS[currentShot % ACCENT_COLORS.length];
 
@@ -53,7 +54,11 @@ export const CameraView: React.FC<CameraViewProps> = ({
 
   const handleCapture = () => {
     if (countdown !== null) return; // Mencegah klik multiple
-    setCountdown(5);
+    if (isTimerEnabled) {
+      setCountdown(5);
+    } else {
+      executeCapture();
+    }
   };
 
   const handleConfirm = () => {
@@ -67,12 +72,13 @@ export const CameraView: React.FC<CameraViewProps> = ({
       onComplete(newPhotos);
     } else {
       setCurrentShot((prev) => prev + 1);
+      if (isTimerEnabled) setCountdown(5);
     }
   };
 
   const handleRetake = () => {
     setPreviewPhoto(null);
-    setCountdown(5);
+    if (isTimerEnabled) setCountdown(5);
   };
 
   // Kondisi error: jika akses kamera ditolak
@@ -93,7 +99,15 @@ export const CameraView: React.FC<CameraViewProps> = ({
         <span className="font-mono text-xs text-[#888888]">
           Memories / Today / Capture
         </span>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
+          <button
+            onClick={() => setIsTimerEnabled(!isTimerEnabled)}
+            className={`flex items-center justify-center h-9 px-3 rounded-full active:scale-95 transition-colors font-mono text-xs font-bold ${
+              isTimerEnabled ? "bg-[#f5f1ea] text-[#0d0d0f]" : "bg-[#2e2e2e] text-[#888888]"
+            }`}
+          >
+            {isTimerEnabled ? "TIMER: 5S" : "TIMER: OFF"}
+          </button>
           <button
             onClick={switchCamera}
             className="flex items-center justify-center w-9 h-9 bg-[#f5f1ea] text-[#0d0d0f] rounded-full active:scale-95 transition-transform"

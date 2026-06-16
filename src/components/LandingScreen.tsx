@@ -21,7 +21,7 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({ onStart }) => {
 
   return (
     <div
-      className="min-h-screen bg-bg flex flex-col pb-12"
+      className="h-[100dvh] w-full overflow-hidden bg-bg flex flex-col"
       style={{
         opacity: isVisible ? 1 : 0,
         transition: "opacity 0.6s ease-in-out",
@@ -38,15 +38,15 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({ onStart }) => {
       </nav>
 
       {/* 2. BREADCRUMB */}
-      <div className="mt-8 px-6">
+      <div className="mt-12 px-6 text-center">
         <span className="font-mono text-xs text-[#555555]">
           Memories / Today / Session 01
         </span>
       </div>
 
       {/* 3. JUDUL SECTION */}
-      <div className="mt-4 px-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <h1 className="text-7xl md:text-8xl font-serif text-cream leading-tight">
+      <div className="mt-4 px-6 flex flex-col items-center justify-center">
+        <h1 className="text-7xl md:text-8xl font-serif text-cream leading-tight text-center">
           Amel's Birthday
         </h1>
       </div>
@@ -58,7 +58,7 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({ onStart }) => {
       <div className="px-6">
         <button
           onClick={onStart}
-          className="w-full bg-accent-pink rounded-lg py-10 px-8 text-left hover:scale-[1.02] transition-transform duration-200 cursor-pointer flex flex-col gap-2 border-none outline-none"
+          className="w-full bg-accent-pink rounded-lg py-10 px-8 text-center items-center hover:scale-[1.02] transition-transform duration-200 cursor-pointer flex flex-col gap-2 border-none outline-none"
         >
           <span className="font-mono font-bold uppercase text-xl text-white">
             CELEBRATE AMEL'S BIRTHDAY!
