@@ -70,6 +70,11 @@ export const CameraView: React.FC<CameraViewProps> = ({
     }
   };
 
+  const handleRetake = () => {
+    setPreviewPhoto(null);
+    setCountdown(5);
+  };
+
   // Kondisi error: jika akses kamera ditolak
   if (error) {
     return (
@@ -113,12 +118,11 @@ export const CameraView: React.FC<CameraViewProps> = ({
       {/* 2. AREA KAMERA */}
       <div className="flex-1 min-h-0 flex items-center justify-center bg-[#0d0d0f] p-2 md:p-4">
         <div
-          className="relative overflow-hidden w-full"
+          className="relative overflow-hidden h-full max-w-full"
           style={{
             aspectRatio: "9/16",
-            maxHeight: "100%",
-            maxWidth: "100%",
             border: `3px solid ${activeColor}`,
+            margin: "0 auto",
           }}
         >
           {/* Video sengaja SELALU dirender di background agar stream kamera tidak freeze saat next capture */}
@@ -127,48 +131,44 @@ export const CameraView: React.FC<CameraViewProps> = ({
             autoPlay
             playsInline
             muted
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover z-0"
             style={{ transform: facingMode === "user" ? "scaleX(-1)" : "none" }}
           />
 
-          {/* Overlay Kotak Bantuan / Grid & Info */}
-          {!previewPhoto && (
-            <div className="absolute inset-0 pointer-events-none z-10 flex flex-col">
-              <div className="flex-1 bg-black/60"></div>
-              {/* Area Tengah (Jendela) yang persis akan masuk final image */}
-              <div className="w-full border-y border-white/40" style={{ aspectRatio: "1080/542" }}></div>
-              <div className="flex-1 bg-black/60"></div>
+          {/* Overlay Preview (Menutupi video) */}
+          {previewPhoto && (
+            <div className="absolute inset-0 z-10 bg-[#0d0d0f]">
+              <img src={previewPhoto} alt="Preview" className="w-full h-full object-cover" />
             </div>
           )}
 
-          {!previewPhoto && (
-            <div className="absolute top-0 left-0 bg-black/60 px-2 py-1 z-20">
-              <span className="font-mono text-xs" style={{ color: activeColor }}>
-                Capture 0{currentShot + 1}
-              </span>
-            </div>
-          )}
+          {/* Overlay Kotak Bantuan Selalu Muncul (Termasuk Saat Preview) Biar Gak Keliatan Zoom */}
+          <div className="absolute inset-0 pointer-events-none z-20 flex flex-col">
+            <div className="flex-1 bg-black/60"></div>
+            {/* Area Tengah (Jendela) yang persis akan masuk final image */}
+            <div className="w-full border-y border-white/40" style={{ aspectRatio: "1080/542" }}></div>
+            <div className="flex-1 bg-black/60"></div>
+          </div>
 
+          {/* Status Label (Capture # atau Preview) */}
+          <div className="absolute top-0 left-0 bg-black/60 px-2 py-1 z-30">
+            <span className="font-mono text-xs" style={{ color: previewPhoto ? "#888888" : activeColor }}>
+              {previewPhoto ? "PREVIEW" : `Capture 0${currentShot + 1}`}
+            </span>
+          </div>
+
+          {/* Timer Countdown */}
           {countdown !== null && countdown > 0 && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-0 z-40 flex items-center justify-center pointer-events-none">
               <span className="text-9xl font-serif text-white">
                 {countdown}
               </span>
             </div>
           )}
 
+          {/* Efek Flash Kamera */}
           {isCapturing && (
-            <div className="absolute inset-0 bg-white opacity-80 z-30 transition-opacity" />
-          )}
-
-          {/* Overlay Preview (Menutupi video setelah timer selesai) */}
-          {previewPhoto && (
-            <div className="absolute inset-0 z-30 bg-[#0d0d0f]">
-              <img src={previewPhoto} alt="Preview" className="w-full h-full object-cover" />
-              <div className="absolute top-0 left-0 bg-black/60 px-2 py-1">
-                <span className="font-mono text-xs text-[#888888]">PREVIEW</span>
-              </div>
-            </div>
+            <div className="absolute inset-0 bg-white opacity-80 z-50 transition-opacity" />
           )}
         </div>
       </div>
@@ -195,7 +195,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
         ) : (
           <div className="flex flex-row gap-4">
             <button
-              onClick={() => setPreviewPhoto(null)}
+              onClick={handleRetake}
               className="rounded-full px-8 py-3 border border-[#f5f1ea] bg-transparent text-[#f5f1ea] font-mono font-bold text-sm hover:bg-[#f5f1ea]/10 transition-colors"
             >
               RETAKE
