@@ -1,0 +1,215 @@
+import React, { useState, useEffect, useCallback } from "react";
+import { useCamera } from "../hooks/useCamera";
+
+interface CameraViewProps {
+  totalShots: number;
+  onComplete: (photos: string[]) => void;
+}
+
+const ACCENT_COLORS = ["#1e3ed8", "#f4c01f", "#e85d9e"];
+
+export const CameraView: React.FC<CameraViewProps> = ({
+  totalShots,
+  onComplete,
+}) => {
+  const { videoRef, isReady, error, capturePhoto, switchCamera, facingMode } = useCamera();
+
+  const [currentShot, setCurrentShot] = useState<number>(0);
+  const [capturedPhotos, setCapturedPhotos] = useState<string[]>([]);
+  const [previewPhoto, setPreviewPhoto] = useState<string | null>(null);
+  const [isCapturing, setIsCapturing] = useState<boolean>(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+
+  const activeColor = ACCENT_COLORS[currentShot % ACCENT_COLORS.length];
+
+  const executeCapture = useCallback(() => {
+    setIsCapturing(true);
+
+    // 2. Beri sedikit jeda agar animasi flash terlihat
+    setTimeout(() => {
+      try {
+        const photoDataUrl = capturePhoto();
+        setPreviewPhoto(photoDataUrl);
+      } catch (err) {
+        console.error("Gagal mengambil foto:", err);
+      } finally {
+        // 3. Matikan efek flash
+        setIsCapturing(false);
+      }
+    }, 150);
+  }, [capturePhoto]);
+
+  // Effect untuk timer
+  useEffect(() => {
+    if (countdown === null) return;
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (countdown === 0) {
+      executeCapture();
+      setCountdown(null);
+    }
+  }, [countdown, executeCapture]);
+
+  const handleCapture = () => {
+    if (countdown !== null) return; // Mencegah klik multiple
+    setCountdown(5);
+  };
+
+  const handleConfirm = () => {
+    if (!previewPhoto) return;
+
+    const newPhotos = [...capturedPhotos, previewPhoto];
+    setCapturedPhotos(newPhotos);
+    setPreviewPhoto(null);
+
+    if (newPhotos.length >= totalShots) {
+      onComplete(newPhotos);
+    } else {
+      setCurrentShot((prev) => prev + 1);
+    }
+  };
+
+  // Kondisi error: jika akses kamera ditolak
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#0d0d0f] flex items-center justify-center p-6">
+        <p className="text-[#e8432f] font-mono text-center">
+          Camera access denied. Please allow camera permission and refresh.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-[100dvh] w-full overflow-hidden bg-[#0d0d0f] flex flex-col text-[#f5f1ea]">
+      {/* 1. HEADER BAR */}
+      <div className="shrink-0 flex flex-row justify-between items-center p-4 border-b border-[#2e2e2e]">
+        <span className="font-mono text-xs text-[#888888]">
+          Memories / Today / Capture
+        </span>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={switchCamera}
+            className="flex items-center justify-center w-9 h-9 bg-[#f5f1ea] text-[#0d0d0f] rounded-full active:scale-95 transition-transform"
+            aria-label="Switch Camera"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 16V14a2 2 0 0 0-2-2h-4" />
+              <path d="m17 15 3-3-3-3" />
+              <path d="M4 8v2a2 2 0 0 0 2 2h4" />
+              <path d="m7 9-3 3 3 3" />
+            </svg>
+          </button>
+          <span
+            className="font-mono text-sm font-bold"
+            style={{ color: activeColor }}
+          >
+            0{currentShot + 1} / 0{totalShots}
+          </span>
+        </div>
+      </div>
+
+      {/* 2. AREA KAMERA */}
+      <div className="flex-1 min-h-0 flex items-center justify-center bg-[#0d0d0f] p-2 md:p-4">
+        <div
+          className="relative overflow-hidden w-full"
+          style={{
+            aspectRatio: "9/16",
+            maxHeight: "100%",
+            maxWidth: "100%",
+            border: `3px solid ${activeColor}`,
+          }}
+        >
+          {/* Video sengaja SELALU dirender di background agar stream kamera tidak freeze saat next capture */}
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ transform: facingMode === "user" ? "scaleX(-1)" : "none" }}
+          />
+
+          {/* Overlay Kotak Bantuan / Grid & Info */}
+          {!previewPhoto && (
+            <div className="absolute inset-0 pointer-events-none z-10 flex flex-col">
+              <div className="flex-1 bg-black/60"></div>
+              {/* Area Tengah (Jendela) yang persis akan masuk final image */}
+              <div className="w-full border-y border-white/40" style={{ aspectRatio: "1080/542" }}></div>
+              <div className="flex-1 bg-black/60"></div>
+            </div>
+          )}
+
+          {!previewPhoto && (
+            <div className="absolute top-0 left-0 bg-black/60 px-2 py-1 z-20">
+              <span className="font-mono text-xs" style={{ color: activeColor }}>
+                Capture 0{currentShot + 1}
+              </span>
+            </div>
+          )}
+
+          {countdown !== null && countdown > 0 && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+              <span className="text-9xl font-serif text-white">
+                {countdown}
+              </span>
+            </div>
+          )}
+
+          {isCapturing && (
+            <div className="absolute inset-0 bg-white opacity-80 z-30 transition-opacity" />
+          )}
+
+          {/* Overlay Preview (Menutupi video setelah timer selesai) */}
+          {previewPhoto && (
+            <div className="absolute inset-0 z-30 bg-[#0d0d0f]">
+              <img src={previewPhoto} alt="Preview" className="w-full h-full object-cover" />
+              <div className="absolute top-0 left-0 bg-black/60 px-2 py-1">
+                <span className="font-mono text-xs text-[#888888]">PREVIEW</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 3. KONTROL BAWAH */}
+      <div className="shrink-0 h-[120px] pb-4 flex flex-col items-center justify-center gap-4">
+        {!previewPhoto ? (
+          <>
+            <button
+              onClick={handleCapture}
+              disabled={!isReady || countdown !== null}
+              className="w-16 h-16 rounded-full border-2 flex items-center justify-center bg-transparent cursor-pointer hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ borderColor: activeColor }}
+            >
+              <div
+                className="w-12 h-12 rounded-full transition-colors"
+                style={{ backgroundColor: activeColor }}
+              />
+            </button>
+            <span className="font-mono text-xs text-[#555555]">
+              {countdown !== null ? "GET READY..." : "TAP TO START"}
+            </span>
+          </>
+        ) : (
+          <div className="flex flex-row gap-4">
+            <button
+              onClick={() => setPreviewPhoto(null)}
+              className="rounded-full px-8 py-3 border border-[#f5f1ea] bg-transparent text-[#f5f1ea] font-mono font-bold text-sm hover:bg-[#f5f1ea]/10 transition-colors"
+            >
+              RETAKE
+            </button>
+            <button
+              onClick={handleConfirm}
+              className="rounded-full px-8 py-3 text-white font-mono font-bold text-sm hover:opacity-90 transition-opacity"
+              style={{ backgroundColor: activeColor }}
+            >
+              {currentShot === totalShots - 1 ? "FINISH" : "NEXT"}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
