@@ -34,7 +34,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
         await navigator.share({
           files: [file],
           title: "Amel's Birthday",
-          text: "#AmelsBirthday2026",
+          text: "#Amels22ndBirthday",
         });
       } else {
         setShareError(

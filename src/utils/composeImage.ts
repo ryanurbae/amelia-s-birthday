@@ -31,7 +31,7 @@ export async function composeGridImage(photos: string[]): Promise<string> {
   ctx.font = "28px monospace";
   ctx.textAlign = "left";
   const paddingX = 40; // Memberikan sedikit jarak dari pinggir kiri
-  ctx.fillText("Memories · Today · Session 01", paddingX, 60);
+  ctx.fillText("Memories · Today · Session 01", paddingX, 240);
 
   // Teks Header Kanan - Tanggal DD.MM.YYYY
   const today = new Date();
@@ -40,17 +40,17 @@ export async function composeGridImage(photos: string[]): Promise<string> {
   const year = today.getFullYear();
   
   ctx.textAlign = "right";
-  ctx.fillText(`${day}.${month}.${year}`, 1040, 60);
+  ctx.fillText(`${day}.${month}.${year}`, 1040, 240);
 
   // Teks Header Utama - Judul
   ctx.fillStyle = "#f5f1ea";
   ctx.font = "bold 96px Georgia, serif";
   ctx.textAlign = "left";
-  ctx.fillText("Amel's Birthday", paddingX, 150);
+  ctx.fillText("Amel's Birthday", paddingX, 350);
 
   // 2. TIGA FOTO VERTIKAL
-  const startY = 200;
-  const endY = 1860;
+  const startY = 390;
+  const endY = 1652;
   const gap = 16;
   const totalArea = endY - startY;
   
@@ -104,13 +104,13 @@ export async function composeGridImage(photos: string[]): Promise<string> {
   // 3. FOOTER
   // Garis Tipis
   ctx.fillStyle = "#2e2e2e";
-  ctx.fillRect(0, 1860, canvas.width, 1);
+  ctx.fillRect(0, 1670, canvas.width, 1);
 
   // Teks Footer
   ctx.fillStyle = "#555555";
   ctx.font = "24px monospace";
   ctx.textAlign = "center";
-  ctx.fillText("Captured with love · #AmelsBirthday2026", canvas.width / 2, 1900);
+  ctx.fillText("Captured with love · #AmelsBirthday2026", canvas.width / 2, 1710);
 
   // Kembalikan Data URL Format PNG
   return canvas.toDataURL("image/png");

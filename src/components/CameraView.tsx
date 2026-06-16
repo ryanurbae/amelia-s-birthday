@@ -132,7 +132,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
       {/* 2. AREA KAMERA */}
       <div className="flex-1 min-h-0 flex items-center justify-center bg-[#0d0d0f] p-2 md:p-4">
         <div
-          className="relative overflow-hidden w-full h-auto max-h-full max-w-full aspect-[9/16] md:w-auto md:h-full md:aspect-[1080/542]"
+          className="relative overflow-hidden w-full h-auto max-h-full max-w-full aspect-[9/16] md:w-auto md:h-full md:aspect-[1080/410]"
           style={{
             border: `3px solid ${activeColor}`,
             margin: "0 auto",
@@ -159,7 +159,7 @@ export const CameraView: React.FC<CameraViewProps> = ({
           <div className="absolute inset-0 pointer-events-none z-20 flex flex-col md:hidden">
             <div className="flex-1 bg-black/60"></div>
             {/* Area Tengah (Jendela) yang persis akan masuk final image */}
-            <div className="w-full border-y border-white/40" style={{ aspectRatio: "1080/542" }}></div>
+            <div className="w-full border-y border-white/40" style={{ aspectRatio: "1080/410" }}></div>
             <div className="flex-1 bg-black/60"></div>
           </div>
 
