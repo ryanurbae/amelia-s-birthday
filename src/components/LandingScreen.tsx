@@ -68,6 +68,13 @@ export const LandingScreen: React.FC<LandingScreenProps> = ({ onStart }) => {
           </span>
         </button>
       </div>
+
+      {/* 6. WATERMARK */}
+      <div className="mt-auto pb-4 px-6 text-center w-full">
+        <p className="font-mono text-[10px] text-[#555555]">
+          Made by Pacar Paling Tampan, Sangar, Pemberani, Rajin Menabung, Soleh, Siap Mengimami Dunia dan Akhirat | Egar Ryan Pratama
+        </p>
+      </div>
     </div>
   );
 };

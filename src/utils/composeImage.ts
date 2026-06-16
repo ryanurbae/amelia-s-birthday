@@ -110,7 +110,7 @@ export async function composeGridImage(photos: string[]): Promise<string> {
   ctx.fillStyle = "#555555";
   ctx.font = "24px monospace";
   ctx.textAlign = "center";
-  ctx.fillText("Captured with love · #AmelsBirthday2026", canvas.width / 2, 1710);
+  ctx.fillText("Captured with love · #Amel's 22nd Birthday", canvas.width / 2, 1710);
 
   // Kembalikan Data URL Format PNG
   return canvas.toDataURL("image/png");

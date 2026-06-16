@@ -100,6 +100,13 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
           ← retake all
         </button>
       </div>
+
+      {/* 6. WATERMARK */}
+      <div className="mt-auto pt-8 pb-2 text-center w-full">
+        <p className="font-mono text-[10px] text-[#555555]">
+          Made by Pacar Paling Tampan, Sangar, Pemberani, Rajin Menabung, Soleh, Siap Mengimami Dunia dan Akhirat | Egar Ryan Pratama
+        </p>
+      </div>
     </div>
   );
 };
